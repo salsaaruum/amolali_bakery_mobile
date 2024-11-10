@@ -1,3 +1,218 @@
+# Tugas 8
+## 1. Apa kegunaan const di Flutter? Jelaskan apa keuntungan ketika menggunakan const pada kode Flutter. Kapan sebaiknya kita menggunakan const, dan kapan sebaiknya tidak digunakan?
+Jawab :
+- **Apa kegunaan const di Flutter?** : const digunakan untuk mendefinisikan objek atau widget sebagai objek yang bersifat immutable (tidak dapat diubah) dan diinisialisasi saat kompilasi (compile time constant), seingga bisa hemat dalam memori dan tidak perlu dibuat ulang setiap kali widget dirender ulang
+- **Jelaskan apa keuntungan ketika menggunakan const pada kode Flutter** : 
+keuntungan menggunakan const antara lain:
+  - **Efisiensi memori** : Objek yang bersifat const hanya dibuat satu kali di memori, sehingga tidak perlu dialokasikan ulang setiap kali digunakan
+  - **Peningkatakn performa** : Flutter menghindari pembuatan ulang objek konstan, yang mempercepat rendering UI
+  - **Optimisasi di compile time** : Karena nilai const dihitung saat compile time, Flutter bisa melakukan optimisasi lebih lanjut di awal dan mengurangi pekerjaan di runtime
+  - **Membuat kode lebih stabil** : Dengan mengunakan const, kita bisa memastikan bahwa nilai-nilai tersebut tidak akan berubah secara tidak terduga di runtime, sehingga lebih mudah melacak dan mengelola state aplikasi
+- **Kapan sebaiknya kita menggunakan const**:
+  - **Widget yang tidak berubah** : Gunakan const pada widget yang sifatnya **statis** dan tidak bergantung pada nilai dinamis atau state aplikasi. Contohnya : Icon(Icons.add)
+  - **Konstanta global** : Jika memiliki nilai konstan yang akan digunakan berulang kali di berbagai aplikasi, seperti warna atau ukuran tertentu, deklarasikan nilai dengan const
+  - **List atau Map tidak berubah** : Jika menggunakan List atau Map yang nilai di dalamnya tidak akan berubah, deklarasikan sebagai const untuk menghemat alokasi memori
+- **Kapan sebaiknya tidak digunakan** :
+  - **Nilai dinamis** : Jika nilai atau widget bergantung pada data yang berubah selama runtime (misal, dari API atau input pengguna), maka tidak perlu menggunakan const
+  - **Objek yang bergantung pada state** : Misal, jika sebuah widget perlu memperbarui tampilannya berdasarkan perubahan state, maka tidak seharusnya menggunakan const
+
+## 2. Jelaskan dan bandingkan penggunaan Column dan Row pada Flutter. Berikan contoh implementasi dari masing-masing layout widget ini!
+Jawab :
+**Deskripsi Column**: Column digunakan untuk menata widget-widget anak dalam arah vertikal (dari atas ke bawah). Properti yang biasa digunakan seperti mainAxisAlignment, crossAxisAlignment, dan children.
+**Perbedaan Column**:
+  - Arah layout nya vertikal (atas ke bawah)
+  - Sumbu utamanya vertikal dan sumbu sekundernya horizontal
+  - Kegunaannya untuk menampikan item berurutan kebawah
+  - mainAxisAlignment digunakan untuk mengatur distribusi vertikal dan mainAxisAlignment digunakan untuk mengatur alignment horizontal
+**Contoh Implementasi di tugas**: widget column digunakan dalam LeftDrawer untuk menampilkan teks secara vertikal 
+
+DrawerHeader(
+  decoration: BoxDecoration(
+    color: Theme.of(context).colorScheme.primary,
+  ),
+  child: Column(
+    children: const [
+      Text(
+        '🍰 Amolali Bakery 🍰',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      Padding(padding: EdgeInsets.all(8)),
+      Text(
+        "Ayo isi perutmu dengan makanan enak!",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 15,
+          color: Colors.white,
+          fontWeight: FontWeight.normal,
+        ),
+      ),
+    ],
+  ),
+)
+
+**Deskripsi Row**: Row digunakan untuk menata widget-widget anak dalam arah horizontal (dari kiri ke kanan). Properti yang biasa digunakan seperti mainAxisAlignment, crossAxisAlignment, dan children.
+**Perbedaan Row**:
+  - Arah layout nya horizontal (kiri ke kanan)
+  - Sumbu utamanya horizontal dan sumbu sekundernya vertikal
+  - Kegunaannya untuk menampikan item berurutan kesamping
+  - mainAxisAlignment digunakan untuk mengatur distribusi horizontal dan mainAxisAlignment digunakan untuk mengatur alignment vertikal
+**Contoh Implementasi di tugas**: Row digunakan di product_card.dart untuk menampilkan ikon dan teks secara horizontal 
+
+class ItemCard extends StatelessWidget {
+  final ItemHomepage item;
+  final Color color;
+
+  const ItemCard(this.item, {super.key, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: () {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!"))
+            );
+
+          if (item.name == "Tambah Produk") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProductEntryFormPage()),
+            );
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  item.icon,
+                  color: Colors.white,
+                  size: 30.0,
+                ),
+                const SizedBox(width: 8), // Memberi jarak antara ikon dan teks
+                Text(
+                  item.name,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+## 3. Sebutkan apa saja elemen input yang kamu gunakan pada halaman form yang kamu buat pada tugas kali ini. Apakah terdapat elemen input Flutter lain yang tidak kamu gunakan pada tugas ini? Jelaskan!
+Jawab :
+- **Elemen input yang digunakan** : 
+  - **TextFormField** : 
+    - Digunakan untuk input teks pada form : nama produk (product), harga *(price), deskripsi (description), kategori (category), dan link url gambar makanan (imgUrl)
+    - Setiap TextFormField memiliki properti decoration untuk menambahkan hint, label, border, dan validator untuk validasi input
+    - Pada variabel harga (price) terdapat pengecekan tambahan agar input berupa angka menggunakan int.tryParse
+  - **ElevatedButton** :
+    - Digunakan untuk tombol "Save" dibagian bawah form yang akan memvalidasi input pengguna saat ditekan
+    - Jika semua input nya valid, maka tombol ini akan menampilkan dialg konfirmasi menggunakan AlertDialog
+
+- **Elemen input yang tidak digunakan** :
+  - **DropdownButtonFormField** : Cocok digunakan untuk pilihan kategori yang terbatas. Elemen ini memungkinkan pengguna memilih dari daftar opsi tanpa mengetik
+  - **Checkbox** atau **Switch** : Berguna untuk opsi biner, seperti memindai produk sebagai "available" atau tidak yang tidak ada di form
+  - **Radio** : Cocok untuk input dengan beberapa pilihan eksklusif, misalnya, untuk tipe produk yang hanya memiliki satu pilihan di antara beberapa opsi
+  - **Slider** : Berguna untuk input nilai dalam rentang tertentu, seperti harga produk jika perlu diatur dalam rentang tertentu
+  -**DatePicker** : Digunakan jika form memerlukan input tanggal, misalnya tanggal kadaluarsa produk
+
+## 4. Bagaimana cara kamu mengatur tema (theme) dalam aplikasi Flutter agar aplikasi yang dibuat konsisten? Apakah kamu mengimplementasikan tema pada aplikasi yang kamu buat?
+Jawab : 
+- Untuk mengatur dan menetapkan tema pada aplikasi Flutter, agar konsisten, kita bisa gunakan **"ThemeData"**. Ini memungkinkan kita untuk menentukan gaya umum untuk seluruh isi aplikasi, seperti warna, teks, ikon. Implementasi tema ini dilakukan di dalam **"MateriaApp"** sehingga setiap widget dalam aplikasi mengikuti tema yang ditentukan
+
+- **cara implementasinya** :
+  - Membuat tema global dengan ThemeData : kita bisa menentukan tema utama di MaterialApp pada parameter theme. Disini ThemeData digunakan untuk menentukan warna utama (primarySwatch) dan warna latar (backgroundColor), font, dan gaya teks
+  import 'package:flutter/material.dart';
+  import 'package:amolali_bakery_mobile/screens/menu.dart';
+
+  void main() {
+    runApp(const MyApp());
+  }
+
+  class MyApp extends StatelessWidget {
+    const MyApp({super.key});
+
+    // This widget is the root of your application.
+    @override
+    Widget build(BuildContext context) {
+      return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          // This is the theme of your application.
+          //
+          // TRY THIS: Try running your application with "flutter run". You'll see
+          // the application has a pink toolbar. Then, without quitting the app,
+          // try changing the seedColor in the colorScheme below to Colors.green
+          // and then invoke "hot reload" (save your changes or press the "hot
+          // reload" button in a Flutter-supported IDE, or press "r" if you used
+          // the command line to start the app).
+          //
+          // Notice that the counter didn't reset back to zero; the application
+          // state is not lost during the reload. To reset the state, use hot
+          // restart instead.
+          //
+          // This works for code too, not just values: Most code changes can be
+          // tested with just a hot reload.
+          colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.pink,
+          ).copyWith(
+            secondary: Colors.pink[50]),
+          useMaterial3: true,
+        ),
+        home: MyHomePage(),
+      );
+    }
+  }
+  - Menggunakan tema pada widget : Dengan menggunakan **"Theme.of(context)"**, kita bisa mengakses dan menerapkan gaya dari ThemeData yang telah ditentukan. contoh, 
+  DrawerHeader(
+            // Bagian drawer header
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                child: const Column(
+                  children: []))
+
+- **Apakah kamu mengimplementasikan tema pada aplikasi yang kamu buat?** : Ya, dengan mengimplementasikan Theme.of(context) pada bagian yang ingin dijadikan konsisten mengikuti tema utama tanpa perlu mendefinisikan individual lagi di tiap widget
+
+## 5. Bagaimana cara kamu menangani navigasi dalam aplikasi dengan banyak halaman pada Flutter?
+Jawab :
+- **Navigasi dengan Navigator.push**:
+  - Ketika pengguna mengetuk tombol atau item di aplikasi, seperti tombol "Tambah Produk" di ItemCard, navigasi dilakukan menggunakan **Navigator.push**
+  - **Navigator.push** menambahkan halaman baru ke tumpukan halaman dan menampilkan halaman tersebut tanpa mengganti halaman sebelumnya. Di tugas kali ini, **Navigator.push** digunakan untuk membuka halaman **ProductEntryFormPage**
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const ProductEntryFormPage()),
+  );
+  - Ketika halaman baru ditambahkan ke tumpukan, pengguna dapat menekan tombol kembali untuk kembali ke halaman sebelumnya.
+
+- **Navigasi dengan Navigator.pushReplacement**:
+  - Di dalam left_drawet.dart, ketika pengguna mengetuk "Halaman Utama", kode di tugas ini menggunakan **Navigator.pushReplacement** untuk mengganti halaman saat ini dengan halaman MyHomePage
+  - **Navigator.pushReplacement** mengapus halaman saat ini dari tumpukan navigasi sebelum menambahkan halaman baru, sehingga ketika halaman baru dimuat maka pengguna tidak dapat kembali ke halaman sebelumnya dengan tombol kembali
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => MyHomePage(),
+    ),
+  );
+
+
 # Tugas 7
 ## 1. Jelaskan apa yang dimaksud dengan stateless widget dan stateful widget, dan jelaskan perbedaan dari keduanya.
 Jawab :
