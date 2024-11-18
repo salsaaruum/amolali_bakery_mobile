@@ -47,7 +47,7 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
               return const Column(
                 children: [
                   Text(
-                    'Belum ada data product pada amolali bakery.',
+                    'Belum ada data produk pada amolali bakery.',
                     style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
                   ),
                   SizedBox(height: 8),
@@ -78,18 +78,7 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
                       const SizedBox(height: 10),
                       Text("${snapshot.data![index].fields.category}"),
                       const SizedBox(height: 10),
-                      // Tampilkan gambar dari URL menggunakan Image.network
-                      snapshot.data![index].fields.image.isNotEmpty
-                          ? Image.network(
-                              snapshot.data![index].fields.image,
-                              height: 150, // Sesuaikan tinggi gambar
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            )
-                          : const Text(
-                              "No image available",
-                              style: TextStyle(fontStyle: FontStyle.italic),
-                            ),
+                      Text("${snapshot.data![index].fields.image}")
                     ],
                   ),
                 ),

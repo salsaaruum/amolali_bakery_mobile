@@ -18,7 +18,7 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
   int _price = 0;
   String _description = "";
   String _category = "";
-  String _imageUrl = "";
+  String _image = "";
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +149,7 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                   ),
                   onChanged: (String? value) {
                     setState(() {
-                      _imageUrl = value!;
+                      _image = value!;
                     });
                   },
                   validator: (String? value) {
@@ -180,7 +180,7 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                                     'price': _price.toString(),
                                     'description': _description,
                                     'category' : _category,
-                                    'image_url' : _imageUrl
+                                    'image' : _image,
                                 // Sesuaikan field data sesuai dengan aplikasimu
                                 }),
                             );
@@ -188,7 +188,7 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                                 if (response['status'] == 'success') {
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(const SnackBar(
-                                    content: Text("Mood baru berhasil disimpan!"),
+                                    content: Text("Produk baru berhasil disimpan!"),
                                     ));
                                     Navigator.pushReplacement(
                                         context,
