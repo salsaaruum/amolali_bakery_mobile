@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:amolali_bakery_mobile/screens/menu.dart';
-// Impor halaman MoodEntryFormPage jika sudah dibuat
 import 'package:amolali_bakery_mobile/screens/productentry_form.dart';
+import 'package:amolali_bakery_mobile/screens/list_productentry.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -63,9 +63,20 @@ class LeftDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const ProductEntryFormPage(),
-                ),
-              );
+                ),);
             },
+          ),
+          // Kode ListTile Menu
+          ListTile(
+              leading: const Icon(Icons.add),
+              title: const Text('Daftar Product'),
+              onTap: () {
+                  // Route menu ke halaman product
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ProductEntryPage()),
+                  );
+              },
           ),
         ],
       ),
