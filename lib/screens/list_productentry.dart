@@ -78,7 +78,17 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
                       const SizedBox(height: 10),
                       Text("${snapshot.data![index].fields.category}"),
                       const SizedBox(height: 10),
-                      Text("${snapshot.data![index].fields.image}")
+                      Image.network("${snapshot.data![index].fields.image}",
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Text("Gambar tidak dapat dimuat.");
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return const Center(child: CircularProgressIndicator());
+                        },
+                      ),
                     ],
                   ),
                 ),
