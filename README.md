@@ -330,7 +330,7 @@ Jawab:
           ),
         );
       }
-    }
+
   4. Jangan lupa,tambahkan path('auth/', include('authentication.urls')), pada file mental_health_tracker/urls.py.
 
 - **Membuat halaman login pada proyek tugas Flutter**:
