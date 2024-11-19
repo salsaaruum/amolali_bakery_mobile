@@ -602,109 +602,268 @@ Jawab:
 
 - **Membuat halaman detail untuk setiap item yang terdapat pada halaman daftar Item**. 
   - **Halaman ini dapat diakses dengan menekan salah satu item pada halaman daftar Item**:
-  - **Tampilkan seluruh atribut pada model item kamu pada halaman ini**:  
-  - **Tambahkan tombol untuk kembali ke halaman daftar item**:
-    1. buat folder lib/widgets/product_card.dart:
-      import 'package:amolali_bakery_mobile/screens/list_productentry.dart':
-      import 'package:amolali_bakery_mobile/screens/productentry_form.dart';
-      import 'package:flutter/material.dart';
-      import 'package:amolali_bakery_mobile/screens/login.dart';
-      import 'package:pbp_django_auth/pbp_django_auth.dart';
-      import 'package:provider/provider.dart';
+    1. Buat file baru bernama product_detail_page.dart
+        import 'package:flutter/material.dart';
 
-      class ItemHomepage {
+        class ProductDetailPage extends StatelessWidget {
           final String name;
-          final IconData icon;
+          final int price;
+          final String description;
+          final String category;
+          final String imageUrl;
 
-          ItemHomepage(this.name, this.icon);
-      }
+          const ProductDetailPage({
+            super.key,
+            required this.name,
+            required this.price,
+            required this.description,
+            required this.category,
+            required this.imageUrl,
+          });
 
-      class ItemCard extends StatelessWidget {
-        final ItemHomepage item;
-        final Color color; // Add color parameter
-
-        const ItemCard(this.item, {super.key, required this.color}); // Make color required
-
-        @override
-        Widget build(BuildContext context) {
-          final request = context.watch<CookieRequest>();
-          return Material(
-            color: color, // Use the passed color for the background
-            borderRadius: BorderRadius.circular(12),
-            child: InkWell(
-              onTap: () async {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!"))
-                  );
-                
-                // Navigate ke route yang sesuai (tergantung jenis tombol)
-                if (item.name == "Tambah Produk") {
-                  // Gunakan Navigator.push untuk melakukan navigasi ke MaterialPageRoute yang mencakup MoodEntryFormPage.
-                  // Navigasi ke halaman MoodEntryFormPage
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ProductEntryFormPage()),
-                  );
-                }
-                else if (item.name == "Lihat Produk") {
-                    Navigator.push(context,
-                        MaterialPageRoute(
-                            builder: (context) => const ProductEntryPage()
-                        ),
-                    );
-                }
-                else if (item.name == "Logout") {
-                  final response = await request.logout(
-                      // Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
-                      "http://localhost:8000/auth/logout/");
-                  String message = response["message"];
-                  if (context.mounted) {
-                      if (response['status']) {
-                          String uname = response["username"];
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text("$message Sampai jumpa, $uname."),
-                          ));
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => const LoginPage()),
-                          );
-                      } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text(message),
-                              ),
-                          );
-                      }
-                  }
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        item.icon,
-                        color: Colors.white,
-                        size: 30.0,
+          @override
+          Widget build(BuildContext context) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(name),
+              ),
+              body: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const Padding(padding: EdgeInsets.all(3)),
-                      Text(
-                        item.name,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Price: $price',
+                      style: const TextStyle(fontSize: 18.0),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Description: $description',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Category: $category',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                    const SizedBox(height: 16),
+                    Image.network(
+                      imageUrl,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Text("Gambar tidak dapat dimuat.");
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    ),
+                  ],
                 ),
               ),
-            ),
-          );
+            );
+          }
         }
+    2. Jangan lupa untuk import halaman di list_productentry.dart yang menuju ke halaman baru ketika memencet tombol (melalui nama makanan) dan melihat detail
+        import 'package:flutter/material.dart';
+        import 'package:amolali_bakery_mobile/models/product_entry.dart';
+        import 'package:amolali_bakery_mobile/widgets/left_drawer.dart';
+        import 'package:pbp_django_auth/pbp_django_auth.dart';
+        import 'package:provider/provider.dart';
+        import 'package:amolali_bakery_mobile/screens/product_detail_page.dart';
+
+        class ProductEntryPage extends StatefulWidget {
+          const ProductEntryPage({super.key});
+
+          @override
+          State<ProductEntryPage> createState() => _ProductEntryPageState();
+        }
+
+        class _ProductEntryPageState extends State<ProductEntryPage> {
+          Future<List<Product>> fetchProduct(CookieRequest request) async {
+            // Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
+            final response = await request.get('http://localhost:8000/json/');
+
+            // Melakukan decode response menjadi bentuk json
+            var data = response;
+
+            // Melakukan konversi data json menjadi object ProductEntry
+            List<Product> listProduct = [];
+            for (var d in data) {
+              if (d != null) {
+                listProduct.add(Product.fromJson(d));
+              }
+            }
+            return listProduct;
+          }
+
+          @override
+          Widget build(BuildContext context) {
+            final request = context.watch<CookieRequest>();
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text('Product Entry List'),
+              ),
+              drawer: const LeftDrawer(),
+              body: FutureBuilder(
+                future: fetchProduct(request),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'Belum ada data produk pada amolali bakery.',
+                        style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
+                      ),
+                    );
+                  } else {
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (_, index) => GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductDetailPage(
+                                name: snapshot.data![index].fields.name,
+                                price: snapshot.data![index].fields.price,
+                                description: snapshot.data![index].fields.description,
+                                category: snapshot.data![index].fields.category,
+                                imageUrl: snapshot.data![index].fields.image,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          elevation: 4, // Tinggi bayangan
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Margin antar kotak
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12), // Radius sudut
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0), // Jarak isi ke tepi kotak
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${snapshot.data![index].fields.name}",
+                                  style: const TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8), // Spasi antara nama dan deskripsi
+                                Text(
+                                  "${snapshot.data![index].fields.description}",
+                                  style: const TextStyle(fontSize: 14.0, color: Colors.grey),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Rp ${snapshot.data![index].fields.price}",
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.pink,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            );
+          }
+        }
+  
+  - **Tampilkan seluruh atribut pada model item kamu pada halaman ini**:  
+    1. Kode untuk menampilkan atribut detail item:
+    @override
+      Widget build(BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(name),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Price: $price',
+                  style: const TextStyle(fontSize: 18.0),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Description: $description',
+                  style: const TextStyle(fontSize: 16.0),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Category: $category',
+                  style: const TextStyle(fontSize: 16.0),
+                ),
+                const SizedBox(height: 16),
+                Image.network(
+                  imageUrl,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text("Gambar tidak dapat dimuat.");
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
       }
+
+  - **Tambahkan tombol untuk kembali ke halaman daftar item**:
+    1. Kode untuk kembali ke halaman daftar item:
+        return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (_, index) => GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductDetailPage(
+                          name: snapshot.data![index].fields.name,
+                          price: snapshot.data![index].fields.price,
+                          description: snapshot.data![index].fields.description,
+                          category: snapshot.data![index].fields.category,
+                          imageUrl: snapshot.data![index].fields.image,
+                        ),
+                      ),
+                    );
+                  }
+                )
+        )
 
 - **Melakukan filter pada halaman daftar item dengan hanya menampilkan item yang terasosiasi dengan pengguna yang login**:
   1. Gunakan request.user contohnya pada list_productentry.dart:
@@ -728,6 +887,7 @@ Jawab:
     }
   2. Gunakan ForeignKey pada model user
   3. Pastikan views.py dan urls.py saling terintegrasi supaya tidak ada error
+
 
 
 
